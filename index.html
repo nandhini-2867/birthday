@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday My Bestie💖</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+body{
+  margin:0;
+  background:black;
+  font-family:'Georgia',serif;
+  overflow-x:hidden;
+}
+
+/* 🌌 STAR CANVAS */
+#starCanvas{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:-1;
+}
+
+/* START SCREEN */
+.start-screen{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  color:white;
+}
+
+/* LETTER */
+.letter-section{
+  display:none;
+  padding:40px 20px;
+  max-width:700px;
+  margin:auto;
+}
+
+.paper{
+  background:#fdf5e6;
+  padding:30px;
+  border-radius:12px;
+  box-shadow:0 25px 70px rgba(0,0,0,0.8);
+  margin-bottom:50px;
+  position:relative;
+  color:#3a3a3a;
+}
+
+.paper:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:url('https://www.transparenttextures.com/patterns/aged-paper.png');
+  opacity:0.3;
+}
+
+#text{
+  white-space:pre-line;
+  line-height:1.8;
+}
+
+/* 📸 Polaroid Container */
+.photo-container{
+  display:flex;
+  justify-content:center;
+  gap:80px;
+  flex-wrap:wrap;
+  margin-bottom:80px;
+}
+
+/* 📸 Polaroid Style */
+.polaroid{
+  position:relative;
+  background:white;
+  padding:15px 15px 50px 15px;
+  width:260px;
+  box-shadow:0 25px 60px rgba(0,0,0,0.6);
+  opacity:0;
+  transform:scale(0.8);
+  transition:1s;
+}
+
+/* Slight different tilt */
+.polaroid.left{
+  transform:rotate(-6deg) scale(0.8);
+}
+
+.polaroid.right{
+  transform:rotate(6deg) scale(0.8);
+}
+
+/* Show animation */
+.polaroid.show{
+  opacity:1;
+  transform:rotate(0deg) scale(1);
+}
+
+/* Tape Effect */
+.polaroid::before{
+  content:"";
+  position:absolute;
+  top:-20px;
+  left:50%;
+  transform:translateX(-50%);
+  width:120px;
+  height:35px;
+  background:#e9e2d0;
+  box-shadow:0 3px 6px rgba(0,0,0,0.3);
+}
+
+/* Image */
+.polaroid img{
+  width:100%;
+  display:block;
+}
+
+/* 🎞 Swing Animation */
+@keyframes swingLeft{
+  0%{ transform:rotate(-2deg); }
+  50%{ transform:rotate(2deg); }
+  100%{ transform:rotate(-2deg); }
+}
+
+@keyframes swingRight{
+  0%{ transform:rotate(2deg); }
+  50%{ transform:rotate(-2deg); }
+  100%{ transform:rotate(2deg); }
+}
+
+/* Apply swing after showing */
+.polaroid.left.show{
+  animation:swingLeft 4s ease-in-out infinite;
+}
+
+.polaroid.right.show{
+  animation:swingRight 4s ease-in-out infinite;
+}
+
+/* CAKE POPUP */
+#cakePopup{
+  display:none;
+}
+
+/* FINAL MESSAGE (Mobile Optimized) */
+#finalMessage{
+  display:none;
+  position:fixed;
+  inset:0;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  color:white;
+  padding:20px;
+}
+
+.final-text{
+  font-weight:bold;
+  letter-spacing:1px;
+  max-width:90%;
+  line-height:1.4;
+
+  /* Responsive font */
+  font-size:clamp(22px, 6vw, 42px);
+
+  animation:slowZoom 12s ease forwards;
+}
+
+@keyframes slowZoom{
+  from{transform:scale(1);}
+  to{transform:scale(1.15);}
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="starCanvas"></canvas>
+
+<!-- START -->
+<div class="start-screen" id="startScreen">
+  <h1 class="text-3xl mb-6">Happy Birthday Bestie💖</h1>
+  <button onclick="startLetter()" 
+    class="px-6 py-3 bg-pink-600 text-white rounded-lg">
+    CLICK ME ✨
+  </button>
+</div>
+
+<!-- LETTER -->
+<div class="letter-section" id="letterSection">
+
+  <div class="paper">
+    <h2 class="text-center text-red-800 mb-4">
+      Happy Birthday My Bestie!💕
+    </h2>
+    <div id="text"></div>
+  </div>
+
+  <div class="photo-container">
+    <div class="polaroid left" id="photo1">
+      <img src="photo1.jpg">
+    </div>
+
+    <div class="polaroid right" id="photo2">
+      <img src="photo2.jpg">
+    </div>
+  </div>
+
+  <div class="text-center">
+    <button id="celebrateBtn" onclick="showCake()"
+      class="px-6 py-3 bg-red-700 text-white rounded-lg opacity-0 transition duration-1000">
+      Celebrate 🎉
+    </button>
+  </div>
+
+</div>
+
+<!-- CAKE -->
+<div id="cakePopup" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center flex-col text-white">
+  <div class="text-center">
+    <div id="countdown" class="text-6xl mb-4 font-bold"></div>
+
+    <div class="relative text-9xl mb-6">
+      🎂
+      <div id="flame" class="absolute top-0 left-1/2 -translate-x-1/2 text-3xl animate-pulse">
+        🔥
+      </div>
+    </div>
+
+    <div id="blowText" class="text-xl opacity-80">
+      Blow on... 💨
+    </div>
+  </div>
+</div>
+
+<!-- FINAL -->
+<div id="finalMessage">
+  <div class="final-text" id="finalText"></div>
+</div>
+
+<audio id="music"
+src="https://cdn.pixabay.com/download/audio/2022/10/30/audio_946f07c17f.mp3?filename=happy-birthday-to-you-piano-version-123123.mp3">
+</audio>
+
+<script>
+/* 🌌 STARS */
+const canvas=document.getElementById("starCanvas");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let stars=[];
+for(let i=0;i<150;i++){
+  stars.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    r:Math.random()*1.5,
+    a:Math.random(),
+    s:Math.random()*0.02
+  });
+}
+
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(star=>{
+    star.a+=star.s;
+    if(star.a<=0||star.a>=1) star.s=-star.s;
+    ctx.beginPath();
+    ctx.arc(star.x,star.y,star.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,255,255,${star.a})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+/* LETTER */
+const message=`Happy Birthday da / di Bestie! 🎂
+
+En life-la vandhu romba special aana person nee dhaan. 💖
+Laugh panna, cry panna, ellathukkum en kooda irukra best friend nee. 🫶
+
+Un birthday love, happiness, cake, surprises ellam full-aa irukanum! 🎁🎈
+Innum neraya memories, fun, adventures namma rendu perum create pannalam. ✨
+
+🥳 Stay blessed & always keep smiling! 🌸`;
+
+let i=0;
+
+function startLetter(){
+  document.getElementById("startScreen").style.display="none";
+  document.getElementById("letterSection").style.display="block";
+  document.getElementById("music").play();
+  typeWriter();
+}
+
+function typeWriter(){
+  if(i < message.length){
+    document.getElementById("text").innerHTML += message.charAt(i);
+    i++;
+    setTimeout(typeWriter, 35);
+  } else {
+
+    // Show first photo
+    document.getElementById("photo1").classList.add("show");
+
+    // Show second photo after delay
+    setTimeout(() => {
+      document.getElementById("photo2").classList.add("show");
+    }, 600);
+
+    // Show Celebrate button AFTER photos
+    setTimeout(() => {
+      const btn = document.getElementById("celebrateBtn");
+      btn.classList.remove("opacity-0");
+      btn.classList.add("opacity-100");
+    }, 1300);
+
+  }
+}
+
+/* CAKE FLOW */
+function showCake(){
+  const popup=document.getElementById("cakePopup");
+  const blowText=document.getElementById("blowText");
+  const countdown=document.getElementById("countdown");
+  const flame=document.getElementById("flame");
+
+  popup.style.display="flex";
+  countdown.innerText="";
+  blowText.style.display="block";
+
+  setTimeout(()=>{
+    blowText.style.display="none";
+
+    let count=3;
+    countdown.innerText=count;
+
+    let timer=setInterval(()=>{
+      count--;
+      countdown.innerText=count;
+
+      if(count===0){
+        clearInterval(timer);
+        flame.style.display="none";
+
+        confetti({
+          particleCount:500,
+          spread:200,
+          origin:{y:0.6}
+        });
+
+        setTimeout(()=>{
+          popup.style.display="none";
+          document.getElementById("letterSection").style.display="none";
+          fadeOutMusic();
+          showFinalMessage();
+        },3000);
+      }
+    },1000);
+
+  },2000);
+}
+
+/* MUSIC FADE */
+function fadeOutMusic(){
+  const music=document.getElementById("music");
+  let fade=setInterval(()=>{
+    if(music.volume>0.05){
+      music.volume-=0.05;
+    }else{
+      music.volume=0;
+      music.pause();
+      clearInterval(fade);
+    }
+  },200);
+}
+
+function showFinalMessage(){
+  document.getElementById("finalMessage").style.display="flex";
+
+  const msg = "Once Again Happy Birthday mental 💖   Treat mukiyam Bigilu🍰.......";
+  let index = 0;
+
+  document.getElementById("finalText").innerHTML = "";
+
+  function type(){
+    if(index < msg.length){
+      document.getElementById("finalText").innerHTML += msg.charAt(index);
+      index++;
+      setTimeout(type, 80);
+    }
+  }
+
+  type();
+}
+</script>
+
+</body>
+
+</html>
+
